@@ -1,0 +1,6 @@
+[workspace]
+members = [
+  "glow-core",
+  "glow-utils",
+  "glow"
+]
