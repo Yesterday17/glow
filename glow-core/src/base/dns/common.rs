@@ -1,5 +1,6 @@
 use super::{class, types};
-use glow_utils::*;
+use glow_utils::binary::EasyMerge;
+use glow_utils::{get_bit, get_bits, set0, set1};
 
 struct Header {
     /// A 16 bit identifier assigned by the program that
@@ -29,7 +30,24 @@ struct Header {
     ar_count: u16,
 }
 
+impl Header {}
+
 type HeaderFlag = u16;
+
+trait HeaderFlagTrait {
+    fn is_query(&self) -> bool;
+    fn is_response(&self) -> bool;
+}
+
+impl HeaderFlagTrait for HeaderFlag {
+    fn is_query(&self) -> bool {
+        get_bit!(self, 0, u16) == 0
+    }
+
+    fn is_response(&self) -> bool {
+        get_bit!(self, 0, u16) == 1
+    }
+}
 
 pub struct HeaderFlagBuilder {
     flag: u16,

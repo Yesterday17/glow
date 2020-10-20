@@ -37,18 +37,51 @@ macro_rules! get_bit {
     };
 }
 
+#[macro_export]
+macro_rules! u8_merge {
+    ($x: expr, $y: expr) => {
+        (($x as u16) << 8) | $y as u16
+    };
+}
+
+pub trait EasyMerge<K, V> {
+    fn merge_lower(&self, lower: K) -> V;
+    fn merge_higher(&self, higher: K) -> V;
+}
+
+impl EasyMerge<u8, u16> for u8 {
+    fn merge_lower(&self, lower: u8) -> u16 {
+        u8_merge!(*self, lower)
+    }
+
+    fn merge_higher(&self, higher: u8) -> u16 {
+        u8_merge!(higher, *self)
+    }
+}
+
 #[cfg(test)]
 mod tests {
+    const TEST_U16: u16 = 0b1011010011110101;
+
     #[test]
     fn test_get_bits() {
-        assert_eq!(get_bits!(0b1011010011110101, 5, 7, u16), 0b1001111);
+        assert_eq!(get_bits!(TEST_U16, 5, 7, u16), 0b1001111);
     }
 
     #[test]
     fn test_get_bit() {
-        assert_eq!(get_bit!(0b1011010011110101, 0, u16), 1);
-        assert_eq!(get_bit!(0b1011010011110101, 1, u16), 0);
-        assert_eq!(get_bit!(0b1011010011110101, 7, u16), 0);
-        assert_eq!(get_bit!(0b1011010011110101, 8, u16), 1);
+        assert_eq!(get_bit!(TEST_U16, 0, u16), 1);
+        assert_eq!(get_bit!(TEST_U16, 1, u16), 0);
+        assert_eq!(get_bit!(TEST_U16, 7, u16), 0);
+        assert_eq!(get_bit!(TEST_U16, 8, u16), 1);
+    }
+
+    #[test]
+    fn merge_u8() {
+        use super::EasyMerge;
+        let higher = get_bits!(TEST_U16, 0, 8, u16) as u8;
+        let lower = get_bits!(TEST_U16, 8, 8, u16) as u8;
+        assert_eq!(TEST_U16, higher.merge_lower(lower));
+        assert_eq!(TEST_U16, lower.merge_higher(higher));
     }
 }
