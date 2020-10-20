@@ -26,9 +26,11 @@ fn main() -> Result<()> {
 
     let singleton = Singleton::init(&format!("{}/glow.lock", lib_path.to_owned()))?;
 
-    if let Some(matches) = matches.subcommand_matches("ip") {
+    if let Some(_) = matches.subcommand_matches("ip") {
         // TODO: ip subcommand
+        glow_core::ip::ip_get().unwrap();
     }
     singleton.exit();
+
     Ok(())
 }

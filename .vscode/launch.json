@@ -17,7 +17,7 @@
           "kind": "bin"
         }
       },
-      "args": [],
+      "args": ["ip"],
       "cwd": "${workspaceFolder}"
     },
     {
