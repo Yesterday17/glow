@@ -1,3 +1,5 @@
+/// References: https://en.wikipedia.org/wiki/List_of_DNS_record_types and RFCs
+
 /// TYPE fields are used in resource records.
 /// Note that these types are a subset of QTYPEs.
 pub type RecordType = u16;
@@ -24,6 +26,7 @@ pub const MR: RecordType = 9;
 /// 10 a null RR (EXPERIMENTAL)
 pub const NULL: RecordType = 10;
 /// 11 a well known service description
+#[deprecated = "Recommend against using WKS records from DNS(RFC 1127)"]
 pub const WKS: RecordType = 11;
 /// 12 a domain name pointer
 pub const PTR: RecordType = 12;
@@ -35,6 +38,32 @@ pub const MINFO: RecordType = 14;
 pub const MX: RecordType = 15;
 /// 16 text strings
 pub const TXT: RecordType = 16;
+/// 17 response person
+pub const RP: RecordType = 17;
+/// 18 AFS database record
+pub const AFSDB: RecordType = 18;
+/// 19 X25
+pub const X25: RecordType = 19;
+/// 20 integrated service digital network
+pub const ISDN: RecordType = 20;
+/// 21 route through
+pub const RT: RecordType = 21;
+/// 22 network service access point
+pub const NSAP: RecordType = 22;
+/// 23 NASP-PTR
+pub const NSAP_PTR: RecordType = 23;
+/// 24 signature
+pub const SIG: RecordType = 24;
+/// 25
+pub const KEY: RecordType = 25;
+/// 26
+pub const PX: RecordType = 26;
+/// 27
+pub const GPOS: RecordType = 27;
+/// 28 ipv6 address record
+pub const AAAA: RecordType = 28;
+/// 29 location record
+pub const LOC: RecordType = 29;
 
 /// QTYPE fields appear in the question part of a query. QTYPES are a
 /// superset of TYPEs, hence all TYPEs are valid QTYPEs. In addition, the

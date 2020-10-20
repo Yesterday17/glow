@@ -1,53 +1,68 @@
 use super::{class, types};
-use glow_utils::binary::EasyMerge;
-use glow_utils::{get_bit, get_bits, set0, set1};
+use glow_utils::{get_bit, get_bits, set0, set1, u8_merge};
 
-struct Header {
+pub struct Header {
     /// A 16 bit identifier assigned by the program that
     /// generates any kind of query. This identifier is copied
     /// the corresponding reply and can be used by the requester
     /// to match up replies to outstanding queries.
-    id: u16,
+    pub id: u16,
 
     /// header flags, detail described below
     flag: HeaderFlag,
 
     /// an unsigned 16 bit integer specifying the number of
     /// entries in the question section.
-    qd_count: u16,
+    pub qd_count: u16,
 
     /// an unsigned 16 bit integer specifying the number of
     /// resource records in the answer section.
-    an_count: u16,
+    pub an_count: u16,
 
     /// an unsigned 16 bit integer specifying the number of name
     /// server resource records in the authority records
     /// section.
-    ns_count: u16,
+    pub ns_count: u16,
 
     /// an unsigned 16 bit integer specifying the number of
     /// resource records in the additional records section.
-    ar_count: u16,
+    pub ar_count: u16,
 }
 
-impl Header {}
+impl Header {
+    pub fn from(raw: [u8; 12]) -> Header {
+        Header {
+            id: u8_merge!(raw[0], raw[1]),
+            flag: u8_merge!(raw[2], raw[3]),
+            qd_count: u8_merge!(raw[4], raw[5]),
+            an_count: u8_merge!(raw[6], raw[7]),
+            ns_count: u8_merge!(raw[8], raw[9]),
+            ar_count: u8_merge!(raw[10], raw[11]),
+        }
+    }
+
+    pub fn from_vec(raw: Vec<u8>) -> Option<Header> {
+        if raw.len() < 12 {
+            None
+        } else {
+            let mut v: [u8; 12] = [0; 12];
+            for i in 0..12 {
+                v[i] = raw[i];
+            }
+            Some(Header::from(v))
+        }
+    }
+
+    pub fn is_query(&self) -> bool {
+        get_bit!(self.flag, 0, u16) == 0
+    }
+
+    pub fn is_response(&self) -> bool {
+        get_bit!(self.flag, 0, u16) == 1
+    }
+}
 
 type HeaderFlag = u16;
-
-trait HeaderFlagTrait {
-    fn is_query(&self) -> bool;
-    fn is_response(&self) -> bool;
-}
-
-impl HeaderFlagTrait for HeaderFlag {
-    fn is_query(&self) -> bool {
-        get_bit!(self, 0, u16) == 0
-    }
-
-    fn is_response(&self) -> bool {
-        get_bit!(self, 0, u16) == 1
-    }
-}
 
 pub struct HeaderFlagBuilder {
     flag: u16,
