@@ -2,7 +2,8 @@
 
 /// TYPE fields are used in resource records.
 /// Note that these types are a subset of QTYPEs.
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
+#[cfg_attr(debug_assertions, derive(Debug))]
 pub enum Type {
     /// 1 a host address
     A = 1,
@@ -117,7 +118,8 @@ impl From<u16> for Type {
 /// QTYPE fields appear in the question part of a query. QTYPES are a
 /// superset of TYPEs, hence all TYPEs are valid QTYPEs. In addition, the
 /// following QTYPEs are defined:
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
+#[cfg_attr(debug_assertions, derive(Debug))]
 pub enum QType {
     Type(Type),
     /// 252 A request for a transfer of an entire zone

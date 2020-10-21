@@ -3,7 +3,7 @@ use bytes::{BufMut, BytesMut};
 use glow_utils::{get_bit, get_bits, u8_merge};
 use std::net::{Ipv4Addr, Ipv6Addr};
 
-#[derive(Debug)]
+#[cfg_attr(debug_assertions, derive(Debug))]
 pub struct Header {
     /// A 16 bit identifier assigned by the program that
     /// generates any kind of query. This identifier is copied
@@ -93,7 +93,7 @@ impl Into<BytesMut> for Header {
     }
 }
 
-#[derive(Debug)]
+#[cfg_attr(debug_assertions, derive(Debug))]
 pub struct HeaderFlag {
     /// A one bit field that specifies whether this message
     /// is a query (0) or a response (1).
@@ -165,7 +165,7 @@ impl HeaderFlag {
 /// A four bit field that specifies kind of query in this
 /// message. This value is set by the originator of a query
 /// and copied into the response. The values are:
-#[derive(Debug)]
+#[cfg_attr(debug_assertions, derive(Debug))]
 pub enum FlagOpCode {
     /// 0 a standard query (QUERY)
     Query = 0,
@@ -191,7 +191,7 @@ impl From<u16> for FlagOpCode {
 /// Response code - this 4 bit field is set as part of
 /// responses. The values have the following
 /// interpretation:
-#[derive(Debug)]
+#[cfg_attr(debug_assertions, derive(Debug))]
 pub enum FlagRCode {
     /// 0 No error condition
     NoError = 0,
@@ -252,7 +252,6 @@ impl Into<String> for FlagRCode {
     }
 }
 
-#[derive(Debug)]
 pub struct Question {
     /// a domain name represented as a sequence of labels, where
     /// each label consists of a length octet followed by that
@@ -327,7 +326,7 @@ impl Into<BytesMut> for Question {
     }
 }
 
-#[derive(Debug)]
+#[cfg_attr(debug_assertions, derive(Debug))]
 pub struct ResourceRecord {
     /// a domain name to which this resource record pertains.
     pub name: String,
@@ -380,7 +379,7 @@ impl ResourceRecord {
 }
 
 // TODO: more RDATA types
-#[derive(Debug)]
+#[cfg_attr(debug_assertions, derive(Debug))]
 pub enum RData {
     A(Ipv4Addr),
     AAAA(Ipv6Addr),

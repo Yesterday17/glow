@@ -1,6 +1,7 @@
 /// CLASS fields appear in resource records. The following CLASS mnemonics
 /// and values are defined:
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
+#[cfg_attr(debug_assertions, derive(Debug))]
 pub enum Class {
     /// 1 the Internet
     IN = 1,
@@ -35,7 +36,8 @@ impl From<u16> for Class {
 /// QCLASS fields appear in the question section of a query. QCLASS values
 /// are a superset of CLASS values; every CLASS is a valid QCLASS. In
 /// addition to CLASS values, the following QCLASSes are defined:
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
+#[cfg_attr(debug_assertions, derive(Debug))]
 pub enum QClass {
     Class(Class),
     /// 255 any class
