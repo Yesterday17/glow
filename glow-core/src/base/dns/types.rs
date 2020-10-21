@@ -79,6 +79,7 @@ impl GetU16Value for Type {
 /// QTYPE fields appear in the question part of a query. QTYPES are a
 /// superset of TYPEs, hence all TYPEs are valid QTYPEs. In addition, the
 /// following QTYPEs are defined:
+#[derive(Copy, Clone)]
 pub enum QType {
     Type(Type),
     /// 252 A request for a transfer of an entire zone

@@ -1,6 +1,9 @@
 use super::{class, types};
+use bytes::{BufMut, BytesMut};
+use glow_common::traits::GetU16Value;
 use glow_utils::{get_bit, get_bits, set0, set1, u8_merge};
 
+#[derive(Debug)]
 pub struct Header {
     /// A 16 bit identifier assigned by the program that
     /// generates any kind of query. This identifier is copied
@@ -30,7 +33,25 @@ pub struct Header {
 }
 
 impl Header {
-    pub fn from(raw: [u8; 12]) -> Header {
+    pub fn new(
+        id: u16,
+        flag: u16,
+        qd_count: u16,
+        an_count: u16,
+        ns_count: u16,
+        ar_count: u16,
+    ) -> Header {
+        Header {
+            id,
+            flag,
+            qd_count,
+            an_count,
+            ns_count,
+            ar_count,
+        }
+    }
+
+    pub fn from(raw: &[u8]) -> Header {
         Header {
             id: u8_merge!(raw[0], raw[1]),
             flag: u8_merge!(raw[2], raw[3]),
@@ -49,8 +70,19 @@ impl Header {
             for i in 0..12 {
                 v[i] = raw[i];
             }
-            Some(Header::from(v))
+            Some(Header::from(&v))
         }
+    }
+
+    pub fn to_raw(&self) -> BytesMut {
+        let mut buf = BytesMut::with_capacity(12);
+        buf.put_u16(self.id);
+        buf.put_u16(self.flag);
+        buf.put_u16(self.qd_count);
+        buf.put_u16(self.an_count);
+        buf.put_u16(self.ns_count);
+        buf.put_u16(self.ar_count);
+        buf
     }
 
     pub fn is_query(&self) -> bool {
@@ -80,13 +112,13 @@ impl HeaderFlagBuilder {
     /// A one bit field that specifies whether this message is a
     ///
     /// query (0)
-    pub fn qr_query(&mut self) -> &HeaderFlagBuilder {
-        set1!(self.flag, 0, u16);
+    pub fn qr_query(&mut self) -> &mut HeaderFlagBuilder {
+        set0!(self.flag, 0, u16);
         self
     }
     /// or a response (1).
-    pub fn qr_response(&mut self) -> &HeaderFlagBuilder {
-        set0!(self.flag, 0, u16);
+    pub fn qr_response(&mut self) -> &mut HeaderFlagBuilder {
+        set1!(self.flag, 0, u16);
         self
     }
 
@@ -95,7 +127,7 @@ impl HeaderFlagBuilder {
     /// and copied into the response. The values are:
     ///
     /// 0 a standard query (QUERY)
-    pub fn op_standard_query(&mut self) -> &HeaderFlagBuilder {
+    pub fn op_standard_query(&mut self) -> &mut HeaderFlagBuilder {
         set0!(self.flag, 1, u16); // 0
         set0!(self.flag, 2, u16); // 0
         set0!(self.flag, 3, u16); // 0
@@ -103,7 +135,7 @@ impl HeaderFlagBuilder {
         self
     }
     /// 1 an inverse query (IQUERY)
-    pub fn op_inverse_query(&mut self) -> &HeaderFlagBuilder {
+    pub fn op_inverse_query(&mut self) -> &mut HeaderFlagBuilder {
         set0!(self.flag, 1, u16); // 0
         set0!(self.flag, 2, u16); // 0
         set0!(self.flag, 3, u16); // 0
@@ -111,7 +143,7 @@ impl HeaderFlagBuilder {
         self
     }
     /// 2 a server status request (STATUS)
-    pub fn op_status_request(&mut self) -> &HeaderFlagBuilder {
+    pub fn op_status_request(&mut self) -> &mut HeaderFlagBuilder {
         set0!(self.flag, 1, u16); // 0
         set0!(self.flag, 2, u16); // 0
         set1!(self.flag, 3, u16); // 1
@@ -119,7 +151,7 @@ impl HeaderFlagBuilder {
         self
     }
     /// 3-15 reserved for future use
-    pub fn op_reversed(&mut self) -> &HeaderFlagBuilder {
+    pub fn op_reversed(&mut self) -> &mut HeaderFlagBuilder {
         set1!(self.flag, 1, u16); // 1
         set1!(self.flag, 2, u16); // 1
         set1!(self.flag, 3, u16); // 1
@@ -135,19 +167,15 @@ impl HeaderFlagBuilder {
     /// multiple owner names because of aliases. The AA bit
     /// corresponds to the name which matches the query name, or
     /// the first owner name in the answer section.
-    pub fn aa_on(&mut self) -> &HeaderFlagBuilder {
+    pub fn aa_on(&mut self) -> &mut HeaderFlagBuilder {
         set1!(self.flag, 5, u16);
-        self
-    }
-    pub fn aa_off(&mut self) -> &HeaderFlagBuilder {
-        set0!(self.flag, 5, u16);
         self
     }
 
     /// TrunCation - specifies that this message was truncated
     /// due to length greater than that permitted on the
     /// transmission channel.
-    pub fn tc_on(&mut self) -> &HeaderFlagBuilder {
+    pub fn tc_on(&mut self) -> &mut HeaderFlagBuilder {
         set1!(self.flag, 6, u16);
         self
     }
@@ -156,7 +184,7 @@ impl HeaderFlagBuilder {
     /// is copied into the response. If RD is set, it directs
     /// the name server to pursue the query recursively.
     /// Recursive query support is optional.
-    pub fn rd_on(&mut self) -> &HeaderFlagBuilder {
+    pub fn rd_on(&mut self) -> &mut HeaderFlagBuilder {
         set1!(self.flag, 7, u16);
         self
     }
@@ -164,14 +192,14 @@ impl HeaderFlagBuilder {
     /// Recursion Available - this be is set or cleared in a
     /// response, and denotes whether recursive query support is
     /// available in the name server.
-    pub fn ra_on(&mut self) -> &HeaderFlagBuilder {
+    pub fn ra_on(&mut self) -> &mut HeaderFlagBuilder {
         set1!(self.flag, 8, u16);
         self
     }
 
     /// Reserved for future use. Must be zero in all queries
     /// and responses.
-    pub fn zf(&mut self) -> &HeaderFlagBuilder {
+    pub fn zf(&mut self) -> &mut HeaderFlagBuilder {
         set0!(self.flag, 9, u16);
         set0!(self.flag, 10, u16);
         set0!(self.flag, 11, u16);
@@ -183,7 +211,7 @@ impl HeaderFlagBuilder {
     /// interpretation:
     ///
     /// 0 No error condition
-    pub fn rcode_no_error(&mut self) -> &HeaderFlagBuilder {
+    pub fn rcode_no_error(&mut self) -> &mut HeaderFlagBuilder {
         set0!(self.flag, 12, u16);
         set0!(self.flag, 13, u16);
         set0!(self.flag, 14, u16);
@@ -192,7 +220,7 @@ impl HeaderFlagBuilder {
     }
     /// 1 Format error - The name server was
     /// unable to interpret the query.
-    pub fn rcode_format_error(&mut self) -> &HeaderFlagBuilder {
+    pub fn rcode_format_error(&mut self) -> &mut HeaderFlagBuilder {
         set0!(self.flag, 12, u16);
         set0!(self.flag, 13, u16);
         set0!(self.flag, 14, u16);
@@ -202,7 +230,7 @@ impl HeaderFlagBuilder {
     /// 2 Server failure - The name server was
     /// unable to process this query due to a
     /// problem with the name server.
-    pub fn rcode_server_failure(&mut self) -> &HeaderFlagBuilder {
+    pub fn rcode_server_failure(&mut self) -> &mut HeaderFlagBuilder {
         set0!(self.flag, 12, u16);
         set0!(self.flag, 13, u16);
         set1!(self.flag, 14, u16);
@@ -214,7 +242,7 @@ impl HeaderFlagBuilder {
     /// server, this code signifies that the
     /// domain name referenced in the query does
     /// not exist.
-    pub fn rcode_name_error(&mut self) -> &HeaderFlagBuilder {
+    pub fn rcode_name_error(&mut self) -> &mut HeaderFlagBuilder {
         set0!(self.flag, 12, u16);
         set0!(self.flag, 13, u16);
         set1!(self.flag, 14, u16);
@@ -223,7 +251,7 @@ impl HeaderFlagBuilder {
     }
     /// 4 Not Implemented - The name server does
     /// not support the requested kind of query.
-    pub fn rcode_not_implemented(&mut self) -> &HeaderFlagBuilder {
+    pub fn rcode_not_implemented(&mut self) -> &mut HeaderFlagBuilder {
         set0!(self.flag, 12, u16);
         set1!(self.flag, 13, u16);
         set0!(self.flag, 14, u16);
@@ -238,7 +266,7 @@ impl HeaderFlagBuilder {
     /// or a name server may not wish to perform
     /// a particular operation (e.g., zone
     /// transfer) for particular data.
-    pub fn rcode_refused(&mut self) -> &HeaderFlagBuilder {
+    pub fn rcode_refused(&mut self) -> &mut HeaderFlagBuilder {
         set0!(self.flag, 12, u16);
         set1!(self.flag, 13, u16);
         set0!(self.flag, 14, u16);
@@ -246,7 +274,7 @@ impl HeaderFlagBuilder {
         self
     }
     /// 6-15 Reserved for future use.
-    pub fn rcode_reversed(&mut self) -> &HeaderFlagBuilder {
+    pub fn rcode_reversed(&mut self) -> &mut HeaderFlagBuilder {
         set0!(self.flag, 12, u16);
         set1!(self.flag, 13, u16);
         set1!(self.flag, 14, u16);
@@ -255,7 +283,7 @@ impl HeaderFlagBuilder {
     }
 }
 
-struct Question {
+pub struct Question {
     /// a domain name represented as a sequence of labels, where
     /// each label consists of a length octet followed by that
     /// number of octets. The domain name terminates with the
@@ -275,25 +303,64 @@ struct Question {
     q_class: class::QClass,
 }
 
-struct ResourceRecord {
+impl Question {
+    pub fn new(host: &str, q_type: types::QType) -> Question {
+        Question {
+            q_name: host.to_owned(),
+            q_type,
+            q_class: class::QClass::Class(class::Class::IN),
+        }
+    }
+
+    pub fn to_raw(&self) -> BytesMut {
+        let mut buf = BytesMut::with_capacity(12);
+        self.append_to(&mut buf);
+        buf
+    }
+
+    /// append Question to BytesMut for query
+    pub fn append_to<'a>(&self, m: &'a mut BytesMut) -> &'a mut BytesMut {
+        for part in self.q_name.split('.') {
+            m.put_u8(part.len() as u8);
+            m.put(part.as_bytes());
+        }
+        m.put_u8(0);
+        m.put_u16(self.q_type.value());
+        m.put_u16(self.q_class.value());
+        m
+    }
+
+    /// append Question to BytesMut to interfere with GFW
+    /// This Question must be the last question
+    /// reference: https://blog.ddosolitary.org/posts/research-on-dns-packet-forgery-of-gfw/
+    pub fn append_gfw<'a>(&self, m: &'a mut BytesMut) -> &'a mut BytesMut {
+        m.put_u8(0xc0);
+        m.put_u8(0x12);
+        m.put_u16(self.q_type.value());
+        m.put_u16(self.q_class.value());
+        m
+    }
+}
+
+pub struct ResourceRecord {
     /// a domain name to which this resource record pertains.
-    name: String,
+    pub name: String,
 
     /// two octets containing one of the RR type codes. This
     /// field specifies the meaning of the data in the RDATA
     /// field.
-    r_type: types::Type,
+    pub r_type: types::Type,
 
     /// two octets which specify the class of the data in the
     /// RDATA field.
-    class: class::Class,
+    pub class: class::Class,
 
     /// a 32 bit unsigned integer that specifies the time
     /// interval (in seconds) that the resource record may be
     /// cached before it should be discarded. Zero values are
     /// interpreted to mean that the RR can only be used for the
     /// transaction in progress, and should not be cached.
-    ttl: u32,
+    pub ttl: u32,
 
     /// an unsigned 16 bit integer that specifies the length in
     /// octets of the RDATA field.
@@ -304,5 +371,8 @@ struct ResourceRecord {
     /// according to the TYPE and CLASS of the resource record.
     /// For example, the if the TYPE is A and the CLASS is IN,
     /// the RDATA field is a 4 octet ARPA Internet address.
-    r_data: Vec<u8>, // FIXME
+    pub r_data: Vec<u8>, // FIXME
 }
+
+// TODO
+// pub enum RecordData()
