@@ -1,5 +1,5 @@
 use crate::fs::{remove_file, write_file};
-use crate::Result;
+use glow_common::Result;
 use std::path::Path;
 
 const PID_FILE_EXIST: &str = "Pid file already exists.";

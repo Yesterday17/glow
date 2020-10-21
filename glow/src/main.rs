@@ -1,5 +1,6 @@
 use clap::{App, Arg, SubCommand};
-use glow_utils::{Result, Singleton};
+use glow_common::Result;
+use glow_utils::Singleton;
 use nix::unistd::{geteuid, ROOT};
 use std::process::exit;
 

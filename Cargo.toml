@@ -1,5 +1,6 @@
 [workspace]
 members = [
+  "glow-common",
   "glow-core",
   "glow-utils",
   "glow"

@@ -1,4 +1,4 @@
-use crate::Result;
+use glow_common::Result;
 use std::fs;
 use std::io::{Read, Write};
 use std::path::Path;

@@ -268,7 +268,7 @@ struct Question {
     /// The values for this field include all codes valid for a
     /// TYPE field, together with some more general codes which
     /// can match more than one type of RR.
-    q_type: types::QueryType,
+    q_type: types::QType,
 
     /// a two octet code that specifies the class of the query.
     /// For example, the QCLASS field is IN for the Internet.
@@ -282,7 +282,7 @@ struct ResourceRecord {
     /// two octets containing one of the RR type codes. This
     /// field specifies the meaning of the data in the RDATA
     /// field.
-    r_type: types::RecordType,
+    r_type: types::Type,
 
     /// two octets which specify the class of the data in the
     /// RDATA field.

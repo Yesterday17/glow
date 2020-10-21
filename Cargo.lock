@@ -202,6 +202,7 @@ dependencies = [
  "clap 2.33.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "dbus 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "futures 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "glow-common 0.1.0",
  "glow-core 0.1.0",
  "glow-utils 0.1.0",
  "nix 0.19.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -211,10 +212,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "glow-common"
+version = "0.1.0"
+
+[[package]]
 name = "glow-core"
 version = "0.1.0"
 dependencies = [
  "futures 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "glow-common 0.1.0",
  "glow-utils 0.1.0",
  "rtnetlink 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "tokio 0.2.22 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -223,6 +229,9 @@ dependencies = [
 [[package]]
 name = "glow-utils"
 version = "0.1.0"
+dependencies = [
+ "glow-common 0.1.0",
+]
 
 [[package]]
 name = "hermit-abi"

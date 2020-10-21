@@ -1,5 +1,5 @@
 [package]
-name = "glow-core"
+name = "glow-common"
 version = "0.1.0"
 authors = ["Yesterday17 <t@yesterday17.cn>"]
 edition = "2018"
@@ -7,9 +7,3 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rtnetlink = "0.5.0"
-futures = "0.3.6"
-tokio = {version = "0.2.0", features = ["full"]}
-
-glow-common = {path = "../glow-common"}
-glow-utils = {path = "../glow-utils"}
