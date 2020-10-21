@@ -27,12 +27,8 @@ impl DNSClient {
             qd_count += 1;
         }
 
-        let flag = HeaderFlagBuilder::new()
-            .qr_query()
-            .op_standard_query()
-            .rd_on()
-            .build();
-        let mut header = Header::new(0xff, flag, qd_count, 0, 0, 0).to_raw();
+        let mut header =
+            Header::new(0xff, HeaderFlag::DEFAULT_QUERY_FLAG, qd_count, 0, 0, 0).into();
 
         if bypass_gfw {
             Question::new(domain, qtype).append_gfw(&mut header);
@@ -49,8 +45,17 @@ impl DNSClient {
         socket.recv_from(&mut buffer)?;
 
         // parse header
-        let header = Header::from(&buffer);
+        let header = Header::from(&buffer[..]);
         println!("{:?}", header);
+
+        let flag = header.flag();
+        println!("{:?}", flag);
+        match flag.rcode {
+            FlagRCode::NoError => {}
+            _ => {
+                return Err(std::io::Error::new(std::io::ErrorKind::Other, ""));
+            }
+        }
 
         // parse question
         let mut offset: usize = 12;
@@ -60,7 +65,12 @@ impl DNSClient {
             println!("{:?}", question);
         }
 
-        // TODO: parse resource record
+        // parse resource record
+        for _ in 0..header.an_count {
+            let (answer, size) = ResourceRecord::parse(&buffer, offset);
+            offset += size;
+            println!("{:?}", answer)
+        }
 
         Ok(())
     }
