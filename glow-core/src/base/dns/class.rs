@@ -2,7 +2,7 @@ use glow_common::traits::GetU16Value;
 
 /// CLASS fields appear in resource records. The following CLASS mnemonics
 /// and values are defined:
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub enum Class {
     /// 1 the Internet
     IN = 1,
@@ -21,9 +21,23 @@ impl GetU16Value for Class {
     }
 }
 
+impl From<u16> for Class {
+    fn from(raw: u16) -> Self {
+        match raw {
+            1 => Class::IN,
+            #[allow(deprecated)]
+            2 => Class::CS,
+            3 => Class::CH,
+            4 => Class::HS,
+            _ => Class::IN, // FIXME
+        }
+    }
+}
+
 /// QCLASS fields appear in the question section of a query. QCLASS values
 /// are a superset of CLASS values; every CLASS is a valid QCLASS. In
 /// addition to CLASS values, the following QCLASSes are defined:
+#[derive(Debug)]
 pub enum QClass {
     Class(Class),
     /// 255 any class
@@ -36,6 +50,15 @@ impl GetU16Value for QClass {
         match self {
             QClass::Class(c) => c.value(),
             QClass::ANY => 255,
+        }
+    }
+}
+
+impl From<u16> for QClass {
+    fn from(raw: u16) -> Self {
+        match raw {
+            255 => QClass::ANY,
+            _ => QClass::Class(Class::from(raw)),
         }
     }
 }

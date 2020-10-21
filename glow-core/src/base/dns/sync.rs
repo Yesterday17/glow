@@ -39,16 +39,28 @@ impl DNSClient {
         }
         Question::new(domain, qtype).append_to(&mut header);
 
+        // send query
         let socket = UdpSocket::bind(&self.addr)?;
         socket.connect(&self.upstream)?;
         socket.send(&header)?;
 
+        // receive response
         let mut buffer = [0u8; 1500];
         socket.recv_from(&mut buffer)?;
-        let header = Header::from(&buffer);
 
-        // TODO: parse RDATA
+        // parse header
+        let header = Header::from(&buffer);
         println!("{:?}", header);
+
+        // parse question
+        let mut offset: usize = 12;
+        for _ in 0..header.qd_count {
+            let (question, size) = Question::parse(&buffer, offset);
+            offset += size;
+            println!("{:?}", question);
+        }
+
+        // TODO: parse resource record
 
         Ok(())
     }

@@ -4,7 +4,7 @@ use glow_common::traits::GetU16Value;
 
 /// TYPE fields are used in resource records.
 /// Note that these types are a subset of QTYPEs.
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub enum Type {
     /// 1 a host address
     A = 1,
@@ -76,10 +76,50 @@ impl GetU16Value for Type {
     }
 }
 
+impl From<u16> for Type {
+    fn from(raw: u16) -> Self {
+        match raw {
+            1 => Type::A,
+            2 => Type::NS,
+            #[allow(deprecated)]
+            3 => Type::MD,
+            #[allow(deprecated)]
+            4 => Type::MF,
+            5 => Type::CNAME,
+            6 => Type::SOA,
+            7 => Type::MB,
+            8 => Type::MG,
+            9 => Type::MR,
+            10 => Type::NULL,
+            #[allow(deprecated)]
+            11 => Type::WKS,
+            12 => Type::PTR,
+            13 => Type::HINFO,
+            14 => Type::MINFO,
+            15 => Type::MX,
+            16 => Type::TXT,
+            17 => Type::RP,
+            18 => Type::AFSDB,
+            19 => Type::X25,
+            20 => Type::ISDN,
+            21 => Type::RT,
+            22 => Type::NSAP,
+            23 => Type::NSAP_PTR,
+            24 => Type::SIG,
+            25 => Type::KEY,
+            26 => Type::PX,
+            27 => Type::GPOS,
+            28 => Type::AAAA,
+            29 => Type::LOC,
+            _ => Type::A, // FIXME
+        }
+    }
+}
+
 /// QTYPE fields appear in the question part of a query. QTYPES are a
 /// superset of TYPEs, hence all TYPEs are valid QTYPEs. In addition, the
 /// following QTYPEs are defined:
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub enum QType {
     Type(Type),
     /// 252 A request for a transfer of an entire zone
@@ -102,6 +142,19 @@ impl GetU16Value for QType {
             #[allow(deprecated)]
             QType::MAILA => 254,
             QType::ANY => 255,
+        }
+    }
+}
+
+impl From<u16> for QType {
+    fn from(raw: u16) -> Self {
+        match raw {
+            252 => QType::AXFR,
+            253 => QType::MAILB,
+            #[allow(deprecated)]
+            254 => QType::MAILA,
+            255 => QType::ANY,
+            _ => QType::Type(Type::from(raw)),
         }
     }
 }

@@ -1,7 +1,9 @@
+use super::traits::*;
 use super::{class, types};
 use bytes::{BufMut, BytesMut};
 use glow_common::traits::GetU16Value;
 use glow_utils::{get_bit, get_bits, set0, set1, u8_merge};
+use std::net::{Ipv4Addr, Ipv6Addr};
 
 #[derive(Debug)]
 pub struct Header {
@@ -283,6 +285,7 @@ impl HeaderFlagBuilder {
     }
 }
 
+#[derive(Debug)]
 pub struct Question {
     /// a domain name represented as a sequence of labels, where
     /// each label consists of a length octet followed by that
@@ -340,6 +343,56 @@ impl Question {
         m.put_u16(self.q_class.value());
         m
     }
+
+    pub fn parse(raw: &[u8], base_offset: usize) -> (Question, usize) {
+        fn read_name_part(raw: &[u8], offset: usize) -> (String, usize) {
+            let len = raw[offset] as usize;
+            (
+                std::str::from_utf8(&raw[(offset + 1)..(offset + len + 1)])
+                    .unwrap()
+                    .to_owned(),
+                len,
+            )
+        }
+
+        fn read_name(raw: &[u8], base_offset: usize) -> (String, usize) {
+            let mut name = String::new();
+            let mut offset = base_offset;
+            let mut len = raw[offset];
+            while len != 0 {
+                let is_ptr = len & 0b11000000 > 0;
+                let (part, size) = if is_ptr {
+                    let offset = (len as usize & 0b00111111 << 8) + raw[offset + 1] as usize;
+                    read_name(raw, offset)
+                } else {
+                    read_name_part(raw, offset)
+                };
+                name.push_str(&part);
+
+                if is_ptr {
+                    offset += 1;
+                    break;
+                } else {
+                    offset += size + 1;
+                    len = raw[offset];
+                    name.push('.');
+                }
+            }
+            offset += 1; // final '\0'
+            (name, offset - base_offset)
+        }
+
+        let (name, size) = read_name(raw, base_offset);
+        let offset = base_offset + size;
+        (
+            Question {
+                q_name: name,
+                q_type: types::QType::from(u8_merge!(raw[offset], raw[offset + 1])),
+                q_class: class::QClass::from(u8_merge!(raw[offset + 2], raw[offset + 3])),
+            },
+            size + 4,
+        )
+    }
 }
 
 pub struct ResourceRecord {
@@ -375,4 +428,29 @@ pub struct ResourceRecord {
 }
 
 // TODO
-// pub enum RecordData()
+pub enum RData {
+    A(Ipv4Addr),
+    AAAA(Ipv6Addr),
+}
+
+impl EncodeRData for RData {
+    fn encode(&self) -> BytesMut {
+        let mut buf = BytesMut::new();
+        match self {
+            RData::A(addr) => {
+                let octets: [u8; 4] = addr.octets();
+                for octet in octets.iter() {
+                    buf.put_u8(*octet);
+                }
+            }
+            RData::AAAA(addr) => {
+                let octets: [u8; 16] = addr.octets();
+                for octet in octets.iter() {
+                    buf.put_u8(*octet);
+                }
+            }
+        };
+
+        buf
+    }
+}
