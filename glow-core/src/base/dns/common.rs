@@ -1,6 +1,5 @@
 use super::{class, types};
 use bytes::{BufMut, BytesMut};
-use glow_common::traits::GetU16Value;
 use glow_utils::{get_bit, get_bits, u8_merge};
 use std::net::{Ipv4Addr, Ipv6Addr};
 
@@ -290,8 +289,8 @@ impl Question {
             m.put(part.as_bytes());
         }
         m.put_u8(0);
-        m.put_u16(self.q_type.value());
-        m.put_u16(self.q_class.value());
+        m.put_u16(self.q_type.into());
+        m.put_u16(self.q_class.into());
         m
     }
 
@@ -301,8 +300,8 @@ impl Question {
     pub fn append_gfw<'a>(&self, m: &'a mut BytesMut) -> &'a mut BytesMut {
         m.put_u8(0xc0);
         m.put_u8(0x12);
-        m.put_u16(self.q_type.value());
-        m.put_u16(self.q_class.value());
+        m.put_u16(self.q_type.into());
+        m.put_u16(self.q_class.into());
         m
     }
 

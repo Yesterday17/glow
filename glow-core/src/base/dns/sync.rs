@@ -86,6 +86,14 @@ mod tests {
         client
             .query("facebook.com", QType::Type(Type::A), true)
             .unwrap();
-        // TODO: assert_eq!(...)
+    }
+
+    #[test]
+    fn test_query_aaaa() {
+        let mut client = super::DNSClient::new("0.0.0.0:9877");
+        client.upstream("1.0.0.1:53");
+        client
+            .query("facebook.com", QType::Type(Type::AAAA), true)
+            .unwrap();
     }
 }

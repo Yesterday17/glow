@@ -1,5 +1,3 @@
-use glow_common::traits::GetU16Value;
-
 /// CLASS fields appear in resource records. The following CLASS mnemonics
 /// and values are defined:
 #[derive(Copy, Clone, Debug)]
@@ -15,9 +13,9 @@ pub enum Class {
     HS = 4,
 }
 
-impl GetU16Value for Class {
-    fn value(&self) -> u16 {
-        *self as u16
+impl Into<u16> for Class {
+    fn into(self) -> u16 {
+        self as u16
     }
 }
 
@@ -37,7 +35,7 @@ impl From<u16> for Class {
 /// QCLASS fields appear in the question section of a query. QCLASS values
 /// are a superset of CLASS values; every CLASS is a valid QCLASS. In
 /// addition to CLASS values, the following QCLASSes are defined:
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 pub enum QClass {
     Class(Class),
     /// 255 any class
@@ -45,10 +43,10 @@ pub enum QClass {
     ANY,
 }
 
-impl GetU16Value for QClass {
-    fn value(&self) -> u16 {
+impl Into<u16> for QClass {
+    fn into(self) -> u16 {
         match self {
-            QClass::Class(c) => c.value(),
+            QClass::Class(c) => c.into(),
             QClass::ANY => 255,
         }
     }

@@ -1,5 +1,3 @@
-use glow_common::traits::GetU16Value;
-
 /// References: https://en.wikipedia.org/wiki/List_of_DNS_record_types and RFCs
 
 /// TYPE fields are used in resource records.
@@ -70,9 +68,9 @@ pub enum Type {
     LOC = 29,
 }
 
-impl GetU16Value for Type {
-    fn value(&self) -> u16 {
-        *self as u16
+impl Into<u16> for Type {
+    fn into(self) -> u16 {
+        self as u16
     }
 }
 
@@ -133,10 +131,10 @@ pub enum QType {
     ANY,
 }
 
-impl GetU16Value for QType {
-    fn value(&self) -> u16 {
+impl Into<u16> for QType {
+    fn into(self) -> u16 {
         match self {
-            QType::Type(t) => t.value(),
+            QType::Type(t) => t.into(),
             QType::AXFR => 252,
             QType::MAILB => 253,
             #[allow(deprecated)]
