@@ -11,6 +11,8 @@ rtnetlink = "0.5.0"
 futures = "0.3.6"
 tokio = {version = "0.2.0", features = ["full"]}
 bytes = "0.6.0"
+rand = "0.7.3"
+lru = "0.6.0"
 
 glow-common = {path = "../glow-common"}
 glow-utils = {path = "../glow-utils"}

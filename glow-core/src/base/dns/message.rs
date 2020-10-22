@@ -59,8 +59,7 @@ impl Header {
 
 impl Default for Header {
     fn default() -> Self {
-        // TODO: random id
-        Self::new(0xff, HeaderFlag::DEFAULT_QUERY_FLAG, 0, 0, 0, 0)
+        Self::new(rand::random(), HeaderFlag::DEFAULT_QUERY_FLAG, 0, 0, 0, 0)
     }
 }
 
