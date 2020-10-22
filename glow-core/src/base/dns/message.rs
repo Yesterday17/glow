@@ -4,6 +4,7 @@ use glow_utils::{get_bit, get_bits, u8_merge};
 use std::net::{Ipv4Addr, Ipv6Addr};
 
 #[cfg_attr(debug_assertions, derive(Debug))]
+#[derive(Copy, Clone)]
 pub struct Header {
     /// A 16 bit identifier assigned by the program that
     /// generates any kind of query. This identifier is copied
@@ -53,6 +54,13 @@ impl Header {
 
     pub fn flag(&self) -> HeaderFlag {
         HeaderFlag::from(self.flag)
+    }
+}
+
+impl Default for Header {
+    fn default() -> Self {
+        // TODO: random id
+        Self::new(0xff, HeaderFlag::DEFAULT_QUERY_FLAG, 0, 0, 0, 0)
     }
 }
 
@@ -252,6 +260,7 @@ impl Into<String> for FlagRCode {
     }
 }
 
+#[cfg_attr(debug_assertions, derive(Debug))]
 pub struct Question {
     /// a domain name represented as a sequence of labels, where
     /// each label consists of a length octet followed by that
@@ -466,4 +475,115 @@ fn read_name(raw: &[u8], base_offset: usize) -> (String, usize) {
     }
     offset += 1; // final '\0'
     (name, offset - base_offset)
+}
+
+#[cfg_attr(debug_assertions, derive(Debug))]
+pub struct Message {
+    /// sections
+    pub header: Header,
+    pub questions: Vec<Question>,
+    pub answers: Vec<ResourceRecord>,
+
+    /// control flags
+    pub bypass_gfw: bool,
+}
+
+impl From<&[u8]> for Message {
+    fn from(buffer: &[u8]) -> Self {
+        // parse header
+        let header = Header::from(buffer);
+
+        match header.flag().rcode {
+            FlagRCode::NoError => {
+                // parse question
+                let mut offset: usize = 12;
+                let mut questions: Vec<Question> = Vec::new();
+                for _ in 0..header.qd_count {
+                    let (question, size) = Question::parse(&buffer, offset);
+                    questions.push(question);
+                    offset += size;
+                }
+
+                // parse resource record
+                let mut answers: Vec<ResourceRecord> = Vec::new();
+                for _ in 0..header.an_count {
+                    let (answer, size) = ResourceRecord::parse(buffer, offset);
+                    answers.push(answer);
+                    offset += size;
+                }
+
+                Message {
+                    header,
+                    questions,
+                    answers,
+
+                    bypass_gfw: false,
+                }
+            }
+            _ => {
+                // on error
+                Message {
+                    header,
+                    questions: Vec::new(),
+                    answers: Vec::new(),
+
+                    bypass_gfw: false,
+                }
+            }
+        }
+    }
+}
+
+impl Default for Message {
+    fn default() -> Self {
+        Message::new(Header::default(), true)
+    }
+}
+
+impl Into<BytesMut> for Message {
+    fn into(self) -> BytesMut {
+        let mut message = self.header.into();
+
+        // bypass gfw
+        if self.header.qd_count > 1 && self.bypass_gfw {
+            self.questions[0].append_gfw(&mut message);
+        }
+
+        // append question
+        for q in self.questions.iter() {
+            q.append_to(&mut message);
+        }
+
+        // TODO: append a to message
+        // for a in self.answers.iter() {}
+
+        message
+    }
+}
+
+impl Message {
+    pub fn new(header: Header, bypass_gfw: bool) -> Message {
+        let mut message = Message {
+            header,
+            questions: Vec::new(),
+            answers: Vec::new(),
+            bypass_gfw,
+        };
+        message.header.qd_count = if bypass_gfw { 1 } else { 0 };
+        message
+    }
+
+    pub fn add_question(&mut self, q: Question) {
+        self.questions.push(q);
+        self.header.qd_count += 1;
+    }
+
+    pub fn bypass_gfw(&mut self, bypass_gfw: bool) {
+        if self.bypass_gfw && !bypass_gfw {
+            self.header.qd_count -= 1;
+        } else if !self.bypass_gfw && bypass_gfw {
+            self.header.qd_count += 1;
+        }
+        self.bypass_gfw = bypass_gfw;
+    }
 }

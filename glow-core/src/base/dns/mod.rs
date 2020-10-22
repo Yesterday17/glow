@@ -1,5 +1,4 @@
-mod common;
-pub use common::*;
+pub mod message;
 
 pub mod class;
 pub mod types;

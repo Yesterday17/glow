@@ -1,4 +1,4 @@
-use super::common::*;
+use super::message::*;
 use super::types::QType;
 use std::net::UdpSocket;
 use std::str;
@@ -27,57 +27,23 @@ impl DNSClient {
         qtype: QType,
         bypass_gfw: bool,
     ) -> std::io::Result<(Header, Vec<Question>, Vec<ResourceRecord>)> {
-        let mut qd_count = 1;
-        if bypass_gfw {
-            qd_count += 1;
-        }
-
-        let mut header =
-            Header::new(0xff, HeaderFlag::DEFAULT_QUERY_FLAG, qd_count, 0, 0, 0).into();
-
-        if bypass_gfw {
-            Question::new(domain, qtype).append_gfw(&mut header);
-        }
-        Question::new(domain, qtype).append_to(&mut header);
+        let mut message = Message::default();
+        message.bypass_gfw(bypass_gfw);
+        message.add_question(Question::new(domain, qtype));
 
         // send query
         let socket = UdpSocket::bind(&self.addr)?;
         socket.connect(&self.upstream)?;
-        socket.send(&header)?;
+        let message: bytes::BytesMut = message.into();
+        socket.send(&message[..])?;
 
         // receive response
         let mut buffer = [0u8; 1500];
         socket.recv_from(&mut buffer)?;
 
-        // parse header
-        let header = Header::from(&buffer[..]);
-
-        let flag = header.flag();
-        match flag.rcode {
-            FlagRCode::NoError => {}
-            _ => {
-                return Err(std::io::Error::new(std::io::ErrorKind::Other, ""));
-            }
-        }
-
-        // parse question
-        let mut offset: usize = 12;
-        let mut questions: Vec<Question> = Vec::new();
-        for _ in 0..header.qd_count {
-            let (question, size) = Question::parse(&buffer, offset);
-            questions.push(question);
-            offset += size;
-        }
-
-        // parse resource record
-        let mut answers: Vec<ResourceRecord> = Vec::new();
-        for _ in 0..header.an_count {
-            let (answer, size) = ResourceRecord::parse(&buffer, offset);
-            answers.push(answer);
-            offset += size;
-        }
-
-        Ok((header, questions, answers))
+        // parse message
+        let response = Message::from(&buffer[..]);
+        Ok((response.header, response.questions, response.answers))
     }
 }
 
