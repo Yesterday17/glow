@@ -1,5 +1,5 @@
 use futures::stream::TryStreamExt;
-use glow_utils::binary::EasyMerge;
+use glow_utils::u8_merge;
 use rtnetlink::packet::nlas::address::Nla;
 use rtnetlink::packet::AddressMessage;
 use rtnetlink::{new_connection, Error};
@@ -32,21 +32,15 @@ pub async fn ip_get() -> Result<(), Error> {
                         } else if addr.len() == 16 {
                             // IPv6
                             Some(IpAddr::V6(Ipv6Addr::new(
-                                addr[0].merge_lower(addr[1]),
-                                addr[2].merge_lower(addr[3]),
-                                addr[4].merge_lower(addr[5]),
-                                addr[6].merge_lower(addr[7]),
-                                addr[8].merge_lower(addr[9]),
-                                addr[10].merge_lower(addr[11]),
-                                addr[12].merge_lower(addr[13]),
-                                addr[14].merge_lower(addr[15]),
+                                u8_merge!(addr[0], addr[1]),
+                                u8_merge!(addr[2], addr[3]),
+                                u8_merge!(addr[4], addr[5]),
+                                u8_merge!(addr[6], addr[7]),
+                                u8_merge!(addr[8], addr[9]),
+                                u8_merge!(addr[10], addr[11]),
+                                u8_merge!(addr[12], addr[13]),
+                                u8_merge!(addr[14], addr[15]),
                             )))
-                        // Some(IpAddr::V6(Ipv6Addr::from([
-                        //     addr[0], addr[1], addr[2], addr[3], addr[4], addr[5], addr[6],
-                        //     addr[7], addr[8], addr[9], addr[10], addr[11], addr[12], addr[13],
-                        //     addr[14], addr[15],
-                        // ]
-                        //     as [u8; 16])))
                         } else {
                             None
                         }
