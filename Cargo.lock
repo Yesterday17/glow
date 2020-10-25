@@ -48,8 +48,22 @@ version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
+name = "bincode"
+version = "1.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "byteorder 1.3.4 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde 1.0.117 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
 name = "bitflags"
 version = "1.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "buffering"
+version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
@@ -244,11 +258,13 @@ version = "0.1.0"
 name = "glow-core"
 version = "0.1.0"
 dependencies = [
+ "bincode 1.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "bytes 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "futures 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "glow-common 0.1.0",
  "glow-utils 0.1.0",
  "lru 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "neli 0.4.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.7.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "rtnetlink 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "tokio 0.2.22 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -399,6 +415,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "socket2 0.3.15 (registry+https://github.com/rust-lang/crates.io-index)",
  "winapi 0.3.9 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "neli"
+version = "0.4.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "buffering 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "byteorder 1.3.4 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -637,6 +663,11 @@ dependencies = [
 ]
 
 [[package]]
+name = "serde"
+version = "1.0.117"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
 name = "signal-hook"
 version = "0.1.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -840,7 +871,9 @@ dependencies = [
 "checksum arc-swap 0.4.7 (registry+https://github.com/rust-lang/crates.io-index)" = "4d25d88fd6b8041580a654f9d0c581a047baee2b3efee13275f2fc392fc75034"
 "checksum atty 0.2.14 (registry+https://github.com/rust-lang/crates.io-index)" = "d9b39be18770d11421cdb1b9947a45dd3f37e93092cbf377614828a319d5fee8"
 "checksum autocfg 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)" = "cdb031dd78e28731d87d56cc8ffef4a8f36ca26c38fe2de700543e627f8a464a"
+"checksum bincode 1.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "f30d3a39baa26f9651f17b375061f3233dde33424a8b72b0dbe93a68a0bc896d"
 "checksum bitflags 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "cf1de2fe8c75bc145a2f577add951f8134889b4795d47466a54a5c846d691693"
+"checksum buffering 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)" = "e64c1c8b8b4ae23f4bfb012a67b943c992f10ff88cd5d37fb38be92209f2aff2"
 "checksum byteorder 1.3.4 (registry+https://github.com/rust-lang/crates.io-index)" = "08c48aae112d48ed9f069b33538ea9e3e90aa263cfa3d1c24309612b1f7472de"
 "checksum bytes 0.5.6 (registry+https://github.com/rust-lang/crates.io-index)" = "0e4cec68f03f32e44924783795810fa50a7035d8c8ebe78580ad7e6c703fba38"
 "checksum bytes 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)" = "e0dcbc35f504eb6fc275a6d20e4ebcda18cf50d40ba6fabff8c711fa16cb3b16"
@@ -878,6 +911,7 @@ dependencies = [
 "checksum mio-uds 0.6.8 (registry+https://github.com/rust-lang/crates.io-index)" = "afcb699eb26d4332647cc848492bbc15eafb26f08d0304550d5aa1f612e066f0"
 "checksum miow 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "8c1f2f3b1cf331de6896aabf6e9d55dca90356cc9960cca7eaaf408a355ae919"
 "checksum miow 0.3.5 (registry+https://github.com/rust-lang/crates.io-index)" = "07b88fb9795d4d36d62a012dfbf49a8f5cf12751f36d31a9dbe66d528e58979e"
+"checksum neli 0.4.4 (registry+https://github.com/rust-lang/crates.io-index)" = "e85e9782bd259f916321a71dc0292aa6b0fbb63ff949a6f5e45167b793b6b6d3"
 "checksum net2 0.2.35 (registry+https://github.com/rust-lang/crates.io-index)" = "3ebc3ec692ed7c9a255596c67808dee269f64655d8baf7b4f0638e51ba1d6853"
 "checksum netlink-packet-core 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "255ea7f8f99e3f5c2fdae62ddd71013d31c1ea4fddd8a7339a6b0ffbfa75c749"
 "checksum netlink-packet-route 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)" = "075c2390c490b5d8f807fdc7f7c921f42a14d6f5081073fe0a9325331aa425b0"
@@ -906,6 +940,7 @@ dependencies = [
 "checksum regex 1.4.1 (registry+https://github.com/rust-lang/crates.io-index)" = "8963b85b8ce3074fecffde43b4b0dded83ce2f367dc8d363afc56679f3ee820b"
 "checksum regex-syntax 0.6.20 (registry+https://github.com/rust-lang/crates.io-index)" = "8cab7a364d15cde1e505267766a2d3c4e22a843e1a601f0fa7564c0f82ced11c"
 "checksum rtnetlink 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)" = "887246d6c8bb58f2ee8a11b8c7e65565a918cd07edd541d903e79e67ca5532ae"
+"checksum serde 1.0.117 (registry+https://github.com/rust-lang/crates.io-index)" = "b88fa983de7720629c9387e9f517353ed404164b1e482c970a90c1a4aaf7dc1a"
 "checksum signal-hook 0.1.16 (registry+https://github.com/rust-lang/crates.io-index)" = "604508c1418b99dfe1925ca9224829bb2a8a9a04dda655cc01fcad46f4ab05ed"
 "checksum signal-hook-registry 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "a3e12110bc539e657a646068aaf5eb5b63af9d0c1f7b29c97113fad80e15f035"
 "checksum slab 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)" = "c111b5bd5695e56cffe5129854aa230b39c93a305372fdbb2668ca2394eea9f8"
