@@ -133,8 +133,27 @@ impl_var!(
     CmdDelNanFunction          => 118 as u8,
     CmdChangeNanConfig         => 119 as u8,
     CmdNanMatch                => 120 as u8,
-    CmdAfterLast               => 121 as u8,
-    CmdMax                     => 120 as u8
+    CmdSetMulticastToUnicast   => 121 as u8,
+    CmdUpdateConnectParams     => 122 as u8,
+    CmdSetPmk                  => 123 as u8,
+    CmdDelPmk                  => 124 as u8,
+    CmdPortAuthorized          => 125 as u8,
+    CmdReloadRegdb             => 126 as u8,
+    CmdExternalAuth            => 127 as u8,
+    CmdStaOpmodeChanged        => 128 as u8,
+    CmdControlPortFrame        => 129 as u8,
+    CmdGetFtmResponderStats    => 130 as u8,
+    CmdPeerMeasurementStart    => 131 as u8,
+    CmdPeerMeasurementResult   => 132 as u8,
+    CmdPeerMeasurementComplete => 133 as u8,
+    CmdNotifyRadar             => 134 as u8,
+    CmdUpdateOweInfo           => 135 as u8,
+    CmdProbeMeshLink           => 136 as u8,
+    CmdSetTidConfig            => 137 as u8,
+    CmdUnportBeacon            => 138 as u8,
+    CmdControlPortFrameTxStatus=> 139 as u8,
+    CmdAfterLast               => 140 as u8,
+    CmdMax                     => 139 as u8
 );
 
 impl Cmd for Nl80211Cmd {}

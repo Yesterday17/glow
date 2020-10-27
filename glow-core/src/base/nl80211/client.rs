@@ -52,6 +52,7 @@ impl NL80211Client {
     pub(crate) fn send<T>(
         &mut self,
         cmd: T,
+        flags: Option<NlmFFlags>,
         attrs: Option<GenlBuffer<Nl80211Attr, Buffer>>,
     ) -> Result<NlSocketHandle, NlError>
     where
@@ -98,7 +99,10 @@ impl NL80211Client {
         let msg = Nlmsghdr::new(
             None,
             self.family_id,
-            NlmFFlags::new(&[NlmF::Request, NlmF::Ack]),
+            match flags {
+                Some(flags) => flags,
+                None => NlmFFlags::new(&[NlmF::Request, NlmF::Ack]),
+            },
             None,
             None,
             NlPayload::Payload(genlhdr),

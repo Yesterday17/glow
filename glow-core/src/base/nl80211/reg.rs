@@ -6,7 +6,7 @@ use super::{
 };
 use glow_utils::binary::*;
 use neli::{
-    err::NlError, genl::Genlmsghdr, nl::NlPayload, nlattr::Nlattr, types::GenlBuffer,
+    consts::*, err::NlError, genl::Genlmsghdr, nl::NlPayload, nlattr::Nlattr, types::GenlBuffer,
     types::GenlBufferOps,
 };
 
@@ -68,7 +68,11 @@ impl NL80211Client {
     // HIDDEN(reg, dump, NULL, NL80211_CMD_GET_REG, NLM_F_DUMP, CIB_NONE, handle_reg_dump);
     fn reg_dump(&mut self) -> Result<RegData, NlError> {
         let mut result = RegData::default();
-        let mut socket = self.send(Nl80211Cmd::CmdGetReg, None)?;
+        let mut socket = self.send(
+            Nl80211Cmd::CmdGetReg,
+            Some(NlmFFlags::new(&[NlmF::Dump])),
+            None,
+        )?;
 
         let iter = socket.iter::<Genlmsghdr<Nl80211Cmd, Nl80211Attr>>(false);
         for response_result in iter {
@@ -158,13 +162,14 @@ impl NL80211Client {
             NlPayload::Payload(country),
         )?;
         attrs.push(attr);
-        self.send(Nl80211Cmd::CmdGetReg, Some(attrs))?;
+        self.send(Nl80211Cmd::CmdGetReg, None, Some(attrs))?;
         Ok(())
     }
 
     // COMMAND(reg, reload, NULL, NL80211_CMD_RELOAD_REGDB, 0, CIB_NONE,
     //   handle_reg_reload, "Reload the kernel's regulatory database.");
-    pub fn reg_reload(&self) {
-        // TODO
+    pub fn reg_reload(&mut self) -> Result<(), NlError> {
+        self.send(Nl80211Cmd::CmdReloadRegdb, None, None)?;
+        Ok(())
     }
 }
