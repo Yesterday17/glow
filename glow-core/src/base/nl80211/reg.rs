@@ -53,18 +53,12 @@ impl Default for RegRule {
 impl NL80211Client {
     // COMMAND(reg, get, NULL, NL80211_CMD_GET_REG, 0, CIB_NONE, handle_reg_get,
     //   "Print out the kernel's current regulatory domain information.");
-    pub fn reg_get(&mut self, phy: Option<&str>) -> Result<RegData, NlError> {
-        match phy {
-            Some(phy) => {
-                // TODO
-                Ok(RegData::default())
-            }
-            None => self.reg_dump(),
-        }
+    pub fn reg_get(&mut self) -> Result<RegData, NlError> {
+        self.reg_dump()
     }
 
     // HIDDEN(reg, dump, NULL, NL80211_CMD_GET_REG, NLM_F_DUMP, CIB_NONE, handle_reg_dump);
-    pub fn reg_dump(&mut self) -> Result<RegData, NlError> {
+    fn reg_dump(&mut self) -> Result<RegData, NlError> {
         let mut result = RegData::default();
         let mut socket = self.send(Nl80211Cmd::CmdGetReg)?;
 
