@@ -1,4 +1,4 @@
-use super::{constant::*, utils::phy_lookup};
+use super::{attr::Nl80211Attr, constant::*, utils::phy_lookup};
 use neli::{
     consts::*,
     err::NlError,
@@ -49,11 +49,18 @@ impl NL80211Client {
         Ok(())
     }
 
-    pub(crate) fn send<T>(&mut self, cmd: T) -> Result<NlSocketHandle, NlError>
+    pub(crate) fn send<T>(
+        &mut self,
+        cmd: T,
+        attrs: Option<GenlBuffer<Nl80211Attr, Buffer>>,
+    ) -> Result<NlSocketHandle, NlError>
     where
         T: Cmd + std::fmt::Debug,
     {
-        let mut attrs = GenlBuffer::new();
+        let mut attrs = GenlBuffer::from(match attrs {
+            Some(a) => a,
+            None => GenlBuffer::new(),
+        });
         match self.devidx {
             CommandIdBy::Phy(id) => {
                 let attr = Nlattr::new(
@@ -100,16 +107,5 @@ impl NL80211Client {
         let mut socket = NlSocketHandle::connect(NlFamily::Generic, None, U32Bitmask::empty())?;
         socket.send(msg)?;
         Ok(socket)
-    }
-}
-
-mod test2 {
-    #[test]
-    fn test() {
-        // let phy = String::from("");
-        let mut client = super::NL80211Client::new().unwrap();
-        client.set_phy("phy0".to_owned()).unwrap();
-        let result = client.reg_get().unwrap();
-        println!("{:#?}", result);
     }
 }

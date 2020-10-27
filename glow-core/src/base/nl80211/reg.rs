@@ -1,6 +1,14 @@
-use super::client::*;
+use super::{
+    attr::*,
+    client::*,
+    cmd::Nl80211Cmd,
+    utils::{is_alpha2, is_world_regdom},
+};
 use glow_utils::binary::*;
-use neli::err::NlError;
+use neli::{
+    err::NlError, genl::Genlmsghdr, nl::NlPayload, nlattr::Nlattr, types::GenlBuffer,
+    types::GenlBufferOps,
+};
 
 #[derive(Debug)]
 pub struct RegData {
@@ -60,11 +68,7 @@ impl NL80211Client {
     // HIDDEN(reg, dump, NULL, NL80211_CMD_GET_REG, NLM_F_DUMP, CIB_NONE, handle_reg_dump);
     fn reg_dump(&mut self) -> Result<RegData, NlError> {
         let mut result = RegData::default();
-        let mut socket = self.send(Nl80211Cmd::CmdGetReg)?;
-
-        use super::attr::*;
-        use super::cmd::Nl80211Cmd;
-        use neli::genl::Genlmsghdr;
+        let mut socket = self.send(Nl80211Cmd::CmdGetReg, None)?;
 
         let iter = socket.iter::<Genlmsghdr<Nl80211Cmd, Nl80211Attr>>(false);
         for response_result in iter {
@@ -140,8 +144,22 @@ impl NL80211Client {
     // COMMAND(reg, set, "<ISO/IEC 3166-1 alpha2>",
     //  NL80211_CMD_REQ_SET_REG, 0, CIB_NONE, handle_reg_set,
     // "Notify the kernel about the current regulatory domain.");
-    pub fn reg_set(&self, country: &str) {
-        // TODO
+    pub fn reg_set(&mut self, country: &str) -> Result<(), NlError> {
+        if !is_alpha2(country) && !is_world_regdom(country) {
+            return Err(NlError::new("not a valid ISO/IEC 3166-1 alpha2"));
+        }
+
+        let mut attrs = GenlBuffer::new();
+        let attr = Nlattr::new(
+            None,
+            false,
+            false,
+            super::attr::Nl80211Attr::AttrRegAlpha2,
+            NlPayload::Payload(country),
+        )?;
+        attrs.push(attr);
+        self.send(Nl80211Cmd::CmdGetReg, Some(attrs))?;
+        Ok(())
     }
 
     // COMMAND(reg, reload, NULL, NL80211_CMD_RELOAD_REGDB, 0, CIB_NONE,
