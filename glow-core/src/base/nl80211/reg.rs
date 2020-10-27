@@ -21,8 +21,7 @@ pub struct RegRule {
     max_bw_khz: u32,
     max_ant_gain_mbi: u32,
     max_eirp_mbm: u32,
-
-    dfs_cac_time: Option<u32>,
+    dfs_cac_time: u32,
 }
 
 impl Default for RegData {
@@ -46,7 +45,7 @@ impl Default for RegRule {
             max_bw_khz: 0,
             max_ant_gain_mbi: 0,
             max_eirp_mbm: 0,
-            dfs_cac_time: None,
+            dfs_cac_time: 0,
         }
     }
 }
@@ -117,7 +116,7 @@ impl NL80211Client {
                                     }
                                     Nl80211RegRuleAttr::AttrDfsCacTime => {
                                         rule.dfs_cac_time =
-                                            parse_some_u32(payload, attr.nla_network_order);
+                                            parse_u32(payload, attr.nla_network_order);
                                     }
                                     _ => {}
                                 }

@@ -1,4 +1,3 @@
-use super::cmd::Nl80211Cmd;
 use super::constant::*;
 use crate::genlmsg_put;
 use neli::consts::Cmd;

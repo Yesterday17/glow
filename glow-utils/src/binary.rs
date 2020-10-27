@@ -62,16 +62,20 @@ impl EasyMerge<u8, u16> for u8 {
 }
 
 macro_rules! parse_num {
-    ($from: ident, $to: ident, $len: expr) => {
+    ($from: ident, $to: ident, $len: expr, $ge: expr) => {
         let to_array =
             |slice: &[u8]| -> [u8; $len] { slice.try_into().expect("slice with incorrect length") };
 
-        return $to::from_le_bytes(to_array($from));
+        if $ge {
+            return $to::from_be_bytes(to_array($from));
+        } else {
+            return $to::from_le_bytes(to_array($from));
+        }
     };
 }
 
 pub fn parse_u32(from: &[u8], network_order: bool) -> u32 {
-    parse_num!(from, u32, 4);
+    parse_num!(from, u32, 4, network_order);
 }
 
 pub fn parse_some_u32(from: &[u8], network_order: bool) -> Option<u32> {
