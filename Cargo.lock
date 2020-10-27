@@ -62,11 +62,6 @@ version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
-name = "buffering"
-version = "0.4.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-
-[[package]]
 name = "byteorder"
 version = "1.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -264,7 +259,7 @@ dependencies = [
  "glow-common 0.1.0",
  "glow-utils 0.1.0",
  "lru 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "neli 0.4.4 (registry+https://github.com/rust-lang/crates.io-index)",
+ "neli 0.5.0-rc1 (git+https://github.com/jbaublitz/neli?branch=v0.5.0-dev)",
  "rand 0.7.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "rtnetlink 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "tokio 0.2.22 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -419,10 +414,9 @@ dependencies = [
 
 [[package]]
 name = "neli"
-version = "0.4.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
+version = "0.5.0-rc1"
+source = "git+https://github.com/jbaublitz/neli?branch=v0.5.0-dev#411707fefd253de89636f08c70db57aba82b5893"
 dependencies = [
- "buffering 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "byteorder 1.3.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -873,7 +867,6 @@ dependencies = [
 "checksum autocfg 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)" = "cdb031dd78e28731d87d56cc8ffef4a8f36ca26c38fe2de700543e627f8a464a"
 "checksum bincode 1.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "f30d3a39baa26f9651f17b375061f3233dde33424a8b72b0dbe93a68a0bc896d"
 "checksum bitflags 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "cf1de2fe8c75bc145a2f577add951f8134889b4795d47466a54a5c846d691693"
-"checksum buffering 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)" = "e64c1c8b8b4ae23f4bfb012a67b943c992f10ff88cd5d37fb38be92209f2aff2"
 "checksum byteorder 1.3.4 (registry+https://github.com/rust-lang/crates.io-index)" = "08c48aae112d48ed9f069b33538ea9e3e90aa263cfa3d1c24309612b1f7472de"
 "checksum bytes 0.5.6 (registry+https://github.com/rust-lang/crates.io-index)" = "0e4cec68f03f32e44924783795810fa50a7035d8c8ebe78580ad7e6c703fba38"
 "checksum bytes 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)" = "e0dcbc35f504eb6fc275a6d20e4ebcda18cf50d40ba6fabff8c711fa16cb3b16"
@@ -911,7 +904,7 @@ dependencies = [
 "checksum mio-uds 0.6.8 (registry+https://github.com/rust-lang/crates.io-index)" = "afcb699eb26d4332647cc848492bbc15eafb26f08d0304550d5aa1f612e066f0"
 "checksum miow 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "8c1f2f3b1cf331de6896aabf6e9d55dca90356cc9960cca7eaaf408a355ae919"
 "checksum miow 0.3.5 (registry+https://github.com/rust-lang/crates.io-index)" = "07b88fb9795d4d36d62a012dfbf49a8f5cf12751f36d31a9dbe66d528e58979e"
-"checksum neli 0.4.4 (registry+https://github.com/rust-lang/crates.io-index)" = "e85e9782bd259f916321a71dc0292aa6b0fbb63ff949a6f5e45167b793b6b6d3"
+"checksum neli 0.5.0-rc1 (git+https://github.com/jbaublitz/neli?branch=v0.5.0-dev)" = "<none>"
 "checksum net2 0.2.35 (registry+https://github.com/rust-lang/crates.io-index)" = "3ebc3ec692ed7c9a255596c67808dee269f64655d8baf7b4f0638e51ba1d6853"
 "checksum netlink-packet-core 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "255ea7f8f99e3f5c2fdae62ddd71013d31c1ea4fddd8a7339a6b0ffbfa75c749"
 "checksum netlink-packet-route 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)" = "075c2390c490b5d8f807fdc7f7c921f42a14d6f5081073fe0a9325331aa425b0"
