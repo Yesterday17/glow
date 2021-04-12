@@ -300,6 +300,7 @@ name = "glow-utils"
 version = "0.1.0"
 dependencies = [
  "glow-common",
+ "thiserror",
 ]
 
 [[package]]

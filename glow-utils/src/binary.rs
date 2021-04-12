@@ -46,12 +46,12 @@ macro_rules! u8_merge {
     };
 }
 
-pub trait EasyMerge<K, V> {
+pub trait NumMerge<K, V> {
     fn merge_lower(&self, lower: K) -> V;
     fn merge_higher(&self, higher: K) -> V;
 }
 
-impl EasyMerge<u8, u16> for u8 {
+impl NumMerge<u8, u16> for u8 {
     fn merge_lower(&self, lower: u8) -> u16 {
         u8_merge!(*self, lower)
     }
@@ -101,7 +101,7 @@ mod tests {
 
     #[test]
     fn merge_u8() {
-        use super::EasyMerge;
+        use super::NumMerge;
         let higher = get_bits!(TEST_U16, 0, 8, u16) as u8;
         let lower = get_bits!(TEST_U16, 8, 8, u16) as u8;
         assert_eq!(TEST_U16, higher.merge_lower(lower));

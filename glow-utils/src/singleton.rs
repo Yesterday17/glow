@@ -1,18 +1,16 @@
 use crate::fs::{remove_file, write_file};
-use glow_common::Result;
+use crate::error::Error;
 use std::path::Path;
-
-const PID_FILE_EXIST: &str = "Pid file already exists.";
 
 pub struct Singleton {
     pid_file: String,
 }
 
 impl Singleton {
-    pub fn init(file: &str) -> Result<Singleton> {
+    pub fn init(file: &str) -> Result<Singleton, Error> {
         let file_path = Path::new(file);
         if file_path.exists() {
-            return Err(PID_FILE_EXIST.to_owned());
+            return Err(Error::PidFileExist);
         }
 
         match write_file(file, &std::process::id().to_string()) {
