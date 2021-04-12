@@ -1,13 +1,13 @@
 use super::{attr::Nl80211Attr, constant::*, utils::phy_lookup};
 use neli::{
-    consts::*,
+    consts::nl::*,
+    consts::genl::*,
+    consts::socket::*,
     err::NlError,
-    genl::Genlmsghdr,
+    genl::{Genlmsghdr, Nlattr},
     nl::{NlPayload, Nlmsghdr},
-    nlattr::Nlattr,
     socket::*,
     types::*,
-    utils::U32Bitmask,
 };
 use std::str::FromStr;
 
@@ -25,7 +25,7 @@ pub struct NL80211Client {
 
 impl NL80211Client {
     pub fn new() -> Result<NL80211Client, NlError> {
-        let mut socket = NlSocketHandle::connect(NlFamily::Generic, None, U32Bitmask::empty())?;
+        let mut socket = NlSocketHandle::connect(NlFamily::Generic, None, &[])?;
         let family_id = socket.resolve_genl_family(NL80211_FAMILY_NAME)?;
         Ok(NL80211Client {
             family_id,
@@ -55,8 +55,8 @@ impl NL80211Client {
         flags: Option<NlmFFlags>,
         attrs: Option<GenlBuffer<Nl80211Attr, Buffer>>,
     ) -> Result<NlSocketHandle, NlError>
-    where
-        T: Cmd + std::fmt::Debug,
+        where
+            T: Cmd + std::fmt::Debug,
     {
         let mut attrs = GenlBuffer::from(match attrs {
             Some(a) => a,
@@ -108,7 +108,7 @@ impl NL80211Client {
             NlPayload::Payload(genlhdr),
         );
 
-        let mut socket = NlSocketHandle::connect(NlFamily::Generic, None, U32Bitmask::empty())?;
+        let mut socket = NlSocketHandle::connect(NlFamily::Generic, None, &[])?;
         socket.send(msg)?;
         Ok(socket)
     }

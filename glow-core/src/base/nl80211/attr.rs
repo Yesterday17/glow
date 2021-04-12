@@ -1,5 +1,5 @@
 // https://github.com/Eonm/nl80211/blob/master/src/attr.rs
-use neli::{consts::NlAttrType, impl_var};
+use neli::{consts::genl::*, impl_var};
 use std::fmt;
 
 impl_var!(

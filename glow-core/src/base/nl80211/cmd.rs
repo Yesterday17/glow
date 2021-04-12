@@ -1,5 +1,6 @@
 // https://github.com/Eonm/nl80211/blob/master/src/cmd.rs
-use neli::{consts::Cmd, impl_var};
+use neli::impl_var;
+use neli::consts::genl::Cmd;
 
 // https://github.com/mdlayher/wifi/blob/b1436901ddee2ea3ee8782a440a084e457615766/internal/nl80211/const.go
 impl_var!(

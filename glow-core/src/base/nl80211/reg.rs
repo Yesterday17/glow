@@ -6,9 +6,12 @@ use super::{
 };
 use glow_utils::binary::*;
 use neli::{
-    consts::*, err::NlError, genl::Genlmsghdr, nl::NlPayload, nlattr::Nlattr, types::GenlBuffer,
-    types::GenlBufferOps,
+    err::NlError, nl::NlPayload,
 };
+use neli::genl::{Genlmsghdr, Nlattr};
+use neli::types::GenlBuffer;
+use neli::consts::nl::{NlmF, NlmFFlags};
+use neli::attr::Attribute;
 
 #[derive(Debug)]
 pub struct RegData {
@@ -79,7 +82,7 @@ impl NL80211Client {
             let msg = response_result?;
             let handle = msg.get_payload()?.get_attr_handle();
             for attr in handle.iter() {
-                let payload = attr.payload.as_ref();
+                let payload = attr.payload().as_ref();
                 match &attr.nla_type {
                     Nl80211Attr::AttrRegAlpha2 => {
                         result.country.push(payload[0].into());
@@ -91,7 +94,7 @@ impl NL80211Client {
                             let mut rule = RegRule::default();
                             let nested = attr.get_attr_handle()?;
                             for attr in nested.iter() {
-                                let payload = attr.payload.as_ref();
+                                let payload = attr.payload().as_ref();
                                 match &attr.nla_type {
                                     Nl80211RegRuleAttr::AttrRegRuleFlags => {
                                         rule.flags = parse_u32(payload, attr.nla_network_order);
